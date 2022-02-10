@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <bits/stdc++.h>
 #include <set>
 #include <vector>
 #include <algorithm>
@@ -132,6 +133,26 @@ wordmap read_wordmap_file(string filename){
     return map;
 }
 
+wordmap read_wordmap_file_with_numbers(string filename){
+    ifstream file(filename);
+    wordmap map;
+    int count = 0;
+    int i = 1;
+    for (string line; getline(file, line); ) {
+
+        //tokenize line
+        vector <string> tokens;
+        stringstream check1(line);
+        string intermediate;
+        while(getline(check1, intermediate, '\t')) tokens.push_back(intermediate);
+        cout << tokens[0] << tokens[1] << endl;
+
+        map[tokens[0]] = stoi(tokens[1]);
+        i++;
+    }
+    return map;
+}
+
 void make_arabic(){
     string punct_string = "...,(){}[]-'\";:<>/\\|!@#–-$%^&*_+=`~0123456789“”…?";
     for (int i = 0; i < punct_string.length(); i++) {
@@ -143,7 +164,18 @@ void make_arabic(){
     print_list(vec, ofstream("arabic [4k].txt"));
 }
 
-int main()
+void make_arabic_2(){
+    string punct_string = "...,(){}[]-'\";:<>/\\|!@#–-$%^&*_+=`~0123456789“”…?";
+    for (int i = 0; i < punct_string.length(); i++) {
+        punctuation.insert(punct_string[i]);
+    }
+    wordmap map = get_frequency("Egyptian Tweets.tsv");
+    map = postprocess(map);
+    vector<pair<string, int>> vec = vectorize(map, false, 2000);
+    print_list(vec, ofstream("arabic [4k].txt"));
+}
+
+int make_hindi()
 {
     wordmap wordlist1 = read_wordmap_file("../../Indian Langs/HI1K/Wordlist.txt");
     wordmap wordlist2 = read_wordmap_file("../../Indian Langs/HI1K/Wordlist2.txt");
@@ -151,6 +183,23 @@ int main()
     cout << "fused" << final_list.size() << endl;
     vector<pair<string, int>> vec = vectorize(final_list, false, 2000);
     print_list(vec, ofstream("../../Indian Langs/HI1K/hindilist.txt"));
+    return 0;
+}
+
+int make_viet()
+{
+    wordmap wordlist1 = read_wordmap_file_with_numbers("viet.txt");
+    wordmap wordlist2 = read_wordmap_file_with_numbers("viet2.txt");
+    wordmap final_list = fuse(wordlist1, wordlist2);
+    cout << "fused" << final_list.size() << endl;
+    vector<pair<string, int>> vec = vectorize(final_list, false, 5000);
+    print_list(vec, ofstream("vietfused.txt"));
+    return 0;
+}
+
+int main()
+{
+    make_arabic_2();
     return 0;
 }
 
